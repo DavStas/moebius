@@ -859,6 +859,25 @@ function full_block_brush(x, y, col) {
     mouse_y = y;
 }
 
+// DS
+function char_brush(x, y, fgcolor, bgcolor) {
+    const block = doc.data[x + y * render.columns];
+    //176, 177, 178, 219
+    let newCode = 219;
+    // TODO - Get chars from text field and put in array.
+    // TODO - LMB = next char in array.
+    // TODO - RMB = previous char in array.
+    if(block.code == 32) newCode = 176;
+    else if(block.code == 176) newCode = 177;
+    else if (block.code == 177) newCode = 178;
+    const coords = line(mouse_x, mouse_y, x, y);
+    for (const coord of coords) change_data({x: coord.x, y: coord.y, code: newCode, fg: fgcolor, bg: bgcolor});
+    mouse_x = x;
+    mouse_y = y;
+}
+// END DS
+
+
 function get_canvas_xy(event) {
     const canvas_container = document.getElementById("canvas_container");
     const canvas_container_rect = canvas_container.getBoundingClientRect();
@@ -998,7 +1017,11 @@ function mouse_down(event) {
             } else if (toolbar.is_in_colorize_mode()) {
                 mouse_x = x; mouse_y = y;
                 colorize_brush(x, y);
+            } else if (toolbar.is_in_char_brush_mode()) {
+                mouse_x = x; mouse_y = y;
+                char_brush(x, y, fg, bg);
             }
+
         break;
         case editor_modes.LINE:
         case editor_modes.RECTANGLE:
@@ -1141,6 +1164,8 @@ function mouse_move(event) {
                     full_block_brush(x, y, (mouse_button == mouse_button_types.LEFT) ? fg : bg);
                 } else if (toolbar.is_in_colorize_mode()) {
                     colorize_brush(x, y);
+                } else if (toolbar.is_in_char_brush_mode()) {
+                    char_brush(x, y, fg, bg);
                 }
             }
         break;

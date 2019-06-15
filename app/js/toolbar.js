@@ -1,7 +1,7 @@
 let font;
 const F_KEYS = [176, 177, 178, 219, 223, 220, 221, 222, 254, 249];
 let fg, bg;
-const brush_modes = {HALF_BLOCK: 0, FULL_BLOCK: 1, CLEAR_BLOCK: 2, COLORIZE: 3};
+const brush_modes = {HALF_BLOCK: 0, FULL_BLOCK: 1, CLEAR_BLOCK: 2, COLORIZE: 3, CHAR: 4};
 let brush_mode = brush_modes.HALF_BLOCK;
 let colorize_fg = true;
 let colorize_bg = false;
@@ -33,6 +33,7 @@ function update_button_styles() {
             document.getElementById("clear_block").classList.remove("brush_mode_selected");
             document.getElementById("colorize_fg").classList.add("brush_mode_ghosted");
             document.getElementById("colorize_bg").classList.add("brush_mode_ghosted");
+            document.getElementById("characters").classList.remove("brush_mode_selected");
         break;
         case brush_modes.FULL_BLOCK:
             document.getElementById("half_block").classList.remove("brush_mode_selected");
@@ -41,6 +42,7 @@ function update_button_styles() {
             document.getElementById("colorize").classList.remove("brush_mode_selected");
             document.getElementById("colorize_fg").classList.add("brush_mode_ghosted");
             document.getElementById("colorize_bg").classList.add("brush_mode_ghosted");
+            document.getElementById("characters").classList.remove("brush_mode_selected");
         break;
         case brush_modes.CLEAR_BLOCK:
             document.getElementById("half_block").classList.remove("brush_mode_selected");
@@ -49,6 +51,7 @@ function update_button_styles() {
             document.getElementById("colorize").classList.remove("brush_mode_selected");
             document.getElementById("colorize_fg").classList.add("brush_mode_ghosted");
             document.getElementById("colorize_bg").classList.add("brush_mode_ghosted");
+            document.getElementById("characters").classList.remove("brush_mode_selected");
         break;
         case brush_modes.COLORIZE:
             document.getElementById("half_block").classList.remove("brush_mode_selected");
@@ -57,6 +60,16 @@ function update_button_styles() {
             document.getElementById("colorize").classList.add("brush_mode_selected");
             document.getElementById("colorize_fg").classList.remove("brush_mode_ghosted");
             document.getElementById("colorize_bg").classList.remove("brush_mode_ghosted");
+            document.getElementById("characters").classList.remove("brush_mode_selected");
+        break;
+        case brush_modes.CHAR:
+            document.getElementById("half_block").classList.remove("brush_mode_selected");
+            document.getElementById("full_block").classList.remove("brush_mode_selected");
+            document.getElementById("clear_block").classList.remove("brush_mode_selected");
+            document.getElementById("colorize").classList.remove("brush_mode_selected");
+            document.getElementById("colorize_fg").classList.add("brush_mode_ghosted");
+            document.getElementById("colorize_bg").classList.add("brush_mode_ghosted");
+            document.getElementById("characters").classList.add("brush_mode_selected");
         break;
     }
     if (colorize_fg) {
@@ -184,6 +197,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
         colorize_bg = !colorize_bg;
         update_button_styles();
     });
+    document.getElementById("characters").addEventListener("mousedown", (event) => {
+        brush_mode = brush_modes.CHAR;
+        update_button_styles();
+    });
 }, true);
 
 function is_in_half_block_mode() {
@@ -202,6 +219,10 @@ function is_in_colorize_mode() {
     return brush_mode == brush_modes.COLORIZE;
 }
 
+function is_in_char_brush_mode(){
+    return brush_mode == brush_modes.CHAR;
+}
+
 function is_in_colorize_fg_mode() {
     return colorize_fg;
 }
@@ -210,4 +231,4 @@ function is_in_colorize_bg_mode() {
     return colorize_bg;
 }
 
-module.exports = {show_select, show_brush, show_sample, show: show_toolbar, hide: hide_toolbar, set_fg_bg, set_font, set_sample, get_f_key, is_in_half_block_mode, is_in_full_block_mode, is_in_clear_block_mode, is_in_colorize_mode, is_in_colorize_fg_mode, is_in_colorize_bg_mode};
+module.exports = {show_select, show_brush, show_sample, show: show_toolbar, hide: hide_toolbar, set_fg_bg, set_font, set_sample, get_f_key, is_in_half_block_mode, is_in_full_block_mode, is_in_clear_block_mode, is_in_colorize_mode, is_in_colorize_fg_mode, is_in_colorize_bg_mode, is_in_char_brush_mode};

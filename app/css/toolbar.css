@@ -58,7 +58,7 @@ body.dark .panel > div {
     border-bottom-left-radius: 4px;
 }
 
-#full_block, #clear_block {
+#full_block, #clear_block, #characters {
     margin-left: 0px;
     margin-right: 0px;
     border-right: none;
