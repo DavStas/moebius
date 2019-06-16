@@ -26,6 +26,7 @@ let mode;
 let previous_mode;
 let connection;
 const users = [];
+let prevCoords;
 
 function send_sync(channel, opts) {
     return electron.ipcRenderer.sendSync(channel, {id: electron.remote.getCurrentWindow().id, ...opts});
@@ -860,20 +861,39 @@ function full_block_brush(x, y, col) {
 }
 
 // DS
+// TODO - Add brush size.
+// TODO - Get chars from text field.
+//32 = space, 176 = F1, 177 = F2, 178 = F3, 219 = F4
 function char_brush(x, y, fgcolor, bgcolor) {
+    let newCode = -1;
     const block = doc.data[x + y * render.columns];
-    //176, 177, 178, 219
-    let newCode = 219;
-    // TODO - Get chars from text field and put in array.
-    // TODO - LMB = next char in array.
-    // TODO - RMB = previous char in array.
-    if(block.code == 32) newCode = 176;
-    else if(block.code == 176) newCode = 177;
-    else if (block.code == 177) newCode = 178;
     const coords = line(mouse_x, mouse_y, x, y);
-    for (const coord of coords) change_data({x: coord.x, y: coord.y, code: newCode, fg: fgcolor, bg: bgcolor});
+    // While moving mouse, only paint when moved over another block.
+    if(prevCoords == null || (prevCoords[0].x != coords[0].x || prevCoords[0].y != coords[0].y)){
+        if(mouse_button == mouse_button_types.LEFT)
+        {
+            if(block.code == 32) newCode = 176;
+            else if(block.code == 176) newCode = 177;
+            else if (block.code == 177) newCode = 178;
+            else if (block.code == 178) newCode = 219;
+        }
+        else if(mouse_button == mouse_button_types.RIGHT)
+        {
+            if(block.code == 219) newCode = 178;
+            else if(block.code == 178) newCode = 177;
+            else if(block.code == 177) newCode = 176;
+            else if (block.code == 176) newCode = 32;
+        }
+        
+        if(newCode > -1) {
+            for (const coord of coords) change_data({x: coord.x, y: coord.y, code: newCode, fg: fgcolor, bg: bgcolor});
+        }
+    }
+    prevCoords = coords;
     mouse_x = x;
     mouse_y = y;
+
+    return coords;
 }
 // END DS
 
@@ -1018,6 +1038,8 @@ function mouse_down(event) {
                 mouse_x = x; mouse_y = y;
                 colorize_brush(x, y);
             } else if (toolbar.is_in_char_brush_mode()) {
+                // Reset prevCoords. 
+                prevCoords = null;
                 mouse_x = x; mouse_y = y;
                 char_brush(x, y, fg, bg);
             }
