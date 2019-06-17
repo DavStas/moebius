@@ -468,6 +468,10 @@ function document_menu(win) {
                 {label: "Next Background Color", id: "next_background_color", accelerator: "Alt+Right", click(item) {win.send("next_background_color");}},
                 {type: "separator"},
                 {label: "Use Attribute Under Cursor", id: "use_attribute_under_cursor", accelerator: "Alt+U", click(item) {win.send("use_attribute_under_cursor");}},
+                //DS
+                {label: "Insert Line", id: "insert_line", accelerator: "Alt+I", click(item) {win.send("insert_line");}},
+                {label: "Remove Line", id: "remove_line", accelerator: "Alt+U", click(item) {win.send("remove_line");}},
+                //END DS
                 {label: "Default Color", id: "default_color", accelerator: "Cmd+D", click(item) {win.send("default_color");}},
                 {label: "Switch Foreground / Background", id: "switch_foreground_background", accelerator: "Shift+Cmd+X", click(item) {win.send("switch_foreground_background");}}
             ]
@@ -675,6 +679,10 @@ function document_menu(win) {
                 {label: "Next Background Color", id: "next_background_color", accelerator: "Alt+Right", click(item) {win.send("next_background_color");}},
                 {type: "separator"},
                 {label: "Use Attribute Under Cursor", id: "use_attribute_under_cursor", accelerator: "Alt+U", click(item) {win.send("use_attribute_under_cursor");}},
+                //DS
+                {label: "Insert Line", id: "insert_line", accelerator: "Alt+I", click(item) {win.send("insert_line");}},
+                {label: "Remove Line", id: "remove_line", accelerator: "Alt+U", click(item) {win.send("remove_line");}},
+                //END DS
                 {label: "Default Color", id: "default_color", accelerator: "Ctrl+D", click(item) {win.send("default_color");}},
                 {label: "Switch Foreground / Background", id: "switch_foreground_background", accelerator: "Shift+Ctrl+X", click(item) {win.send("switch_foreground_background");}}
             ]
@@ -1022,12 +1030,20 @@ function disable_editing_shortcuts(id) {
     disable_selection_menu_items(id);
     disable_operation_menu_items(id);
     docs[id].menu.getMenuItemById("use_attribute_under_cursor").enabled = false;
+    //DS
+    docs[id].menu.getMenuItemById("insert_line").enabled = false;
+    docs[id].menu.getMenuItemById("remove_line").enabled = false;
+    //END DS
 }
 
 function enable_editing_shortcuts(id) {
     disable_selection_menu_items(id);
     disable_operation_menu_items(id);
     docs[id].menu.getMenuItemById("use_attribute_under_cursor").enabled = true;
+    //DS
+    docs[id].menu.getMenuItemById("insert_line").enabled = true;
+    docs[id].menu.getMenuItemById("remove_line").enabled = true;
+    //END DS
 }
 
 function show_editing_touchbar(id) {

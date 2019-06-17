@@ -285,6 +285,7 @@ function toggle_fg(num) {
     }
 }
 
+
 function render_at(x, y) {
     canvas.render_at(x, y, doc.data[doc.columns * y + x]);
     if (cursor.x == x && cursor.y == y) cursor.draw();
@@ -708,6 +709,53 @@ function use_attribute_under_cursor() {
     set_fg(doc.data[i].fg);
     set_bg(doc.data[i].bg);
 }
+
+// DS
+// Note: array slice / concat could not be used because otherwise undo/redo cannot be used.
+function insert_line() {
+    // Get begin position of line.
+    const pos = cursor.y * render.columns;
+   
+    start_undo_chunk();
+    // move data one line down; last line is overwritten.
+    for(let p = doc.data.length - render.columns - 1; p >= pos; p--)
+    {
+        let new_x = p % render.columns;
+        let new_y = Math.trunc(p / render.columns) + 1;
+        let block = doc.data[p];
+        change_data({x: new_x, y: new_y, code: block.code, fg: block.fg, bg: block.bg});
+    }
+    // Insert new line.
+    for(let p = pos; p < pos + render.columns; p++){
+        let x = p % render.columns;
+        let y = Math.trunc(p / render.columns);
+        change_data({x: x, y: y, code: 32, fg: 7, bg: 0});
+    }
+}
+
+function remove_line() {
+    // Get begin position of line.
+    const pos = (cursor.y * render.columns) + render.columns;
+   
+    start_undo_chunk();
+    // move data one line up; last line is overwritten with empty chars.
+    //for(let p = doc.data.length - render.columns - 1; p <= pos; p++)
+    for(let p = pos; p <= doc.data.length - 1; p++)
+    {
+        let new_x = p % render.columns;
+        let new_y = Math.trunc(p / render.columns) - 1;
+        let block = doc.data[p];
+        change_data({x: new_x, y: new_y, code: block.code, fg: block.fg, bg: block.bg});
+    }
+    // Add new line at the end.
+    for(let p = doc.data.length - render.columns; p < doc.data.length; p++){
+        let x = p % render.columns;
+        let y = Math.trunc(p / render.columns);
+        change_data({x: x, y: y, code: 32, fg: 7, bg: 0});
+    }
+}
+
+// END DS
 
 function default_color() {
     set_fg(7);
@@ -1513,6 +1561,10 @@ electron.ipcRenderer.on("delete_selection", (event, opts) => delete_selection(op
 electron.ipcRenderer.on("undo", (event, opts) => undo(opts));
 electron.ipcRenderer.on("redo", (event, opts) => redo(opts));
 electron.ipcRenderer.on("use_attribute_under_cursor", (event, opts) => use_attribute_under_cursor(opts));
+//DS
+electron.ipcRenderer.on("insert_line", (event, opts) => insert_line(opts));
+electron.ipcRenderer.on("remove_line", (event, opts) => remove_line(opts));
+//END DS
 electron.ipcRenderer.on("default_color", (event, opts) => default_color(opts));
 electron.ipcRenderer.on("switch_foreground_background", (event, opts) => switch_foreground_background(opts));
 electron.ipcRenderer.on("open_reference_image", (event, opts) => open_reference_image(opts));
