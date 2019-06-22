@@ -909,15 +909,105 @@ function full_block_brush(x, y, col) {
 }
 
 // DS
+// https://javascript.info/bezier-curve
+function draw_3point_curve(x1, y1, x2, y2, x3, y3)
+{
+    // create 2 fixed lines.
+    const line_1_2 = line(x1, y1, x2, y2);
+    const line_2_3 = line(x2, y2, x3, y3);
+    const coords = [];
+    
+    // Mark coord[i] on both fixed lines and define variable line between these 2 coords.
+    for (let i = 1; i <= 100; i++)
+    {
+        let arr_1_2_pos = Math.round((line_1_2.length * i) / 100) - 1;
+        let arr_2_3_pos = Math.round((line_2_3.length * i) / 100) - 1;
+        if (arr_1_2_pos < 0) arr_1_2_pos = 0;
+        if (arr_2_3_pos < 0) arr_2_3_pos = 0;
+        if (arr_1_2_pos > line_1_2.length - 1) arr_1_2_pos = line_1_2.length - 1;
+        if (arr_2_3_pos > line_2_3.length - 1) arr_2_3_pos = line_2_3.length - 1;
+        let coord_1_2 = line_1_2[arr_1_2_pos];
+        let coord_2_3 = line_2_3[arr_2_3_pos];
+        // Create 1 variable line.
+        let line_1_3 = line (coord_1_2.x, coord_1_2.y, coord_2_3.x, coord_2_3.y);
+        // Mark coord[i] on this variable line. this is the bezier curve point and needs to be stored.
+        let arr_1_3_pos = Math.round((line_1_3.length * i) / 100) - 1;
+        if (arr_1_3_pos < 0) arr_1_3_pos = 0;
+        if (arr_1_3_pos > line_1_3.length - 1) arr_1_3_pos = line_1_3.length - 1;
+        coords.push(line_1_3[arr_1_3_pos]);
+    }
+
+    return coords;
+
+}
+
+function draw_4point_curve(x1, y1, x2, y2, x3, y3, x4, y4)
+{
+    // create 3 fixed lines.
+    const line_1_2 = line(x1, y1, x2, y2);
+    const line_2_3 = line(x2, y2, x3, y3);
+    const line_3_4 = line(x3, y3, x4, y4);
+
+    const coords = [];
+
+    for (let i = 1; i<=100; i++){
+        // get coords[i] from these 3 fixed lines.
+        let arr_1_2_pos = Math.round((line_1_2.length * i) / 100) - 1;
+        let arr_2_3_pos = Math.round((line_2_3.length * i) / 100) - 1;
+        let arr_3_4_pos = Math.round((line_3_4.length * i) / 100) - 1;
+        if(arr_1_2_pos < 0) arr_1_2_pos = 0;
+        if(arr_2_3_pos < 0) arr_2_3_pos = 0;
+        if(arr_3_4_pos < 0) arr_3_4_pos = 0;
+        if (arr_1_2_pos > line_1_2.length - 1) arr_1_2_pos = line_1_2.length - 1;
+        if (arr_2_3_pos > line_2_3.length - 1) arr_2_3_pos = line_2_3.length - 1;
+        if (arr_3_4_pos > line_3_4.length - 1) arr_3_4_pos = line_3_4.length - 1;
+        let coord_1_2 = line_1_2[arr_1_2_pos];
+        let coord_2_3 = line_2_3[arr_2_3_pos];
+        let coord_3_4 = line_3_4[arr_3_4_pos];
+
+        // create 2 variable lines based on these coords[i].
+        let var_line_1 = line(coord_1_2.x, coord_1_2.y, coord_2_3.x, coord_2_3.y);
+        let var_line_2 = line(coord_2_3.x, coord_2_3.y, coord_3_4.x, coord_3_4.y);
+        // get coords from these 2 var lines.
+        let var_1_pos = Math.round((var_line_1.length * i) / 100) - 1;
+        let var_2_pos = Math.round((var_line_2.length * i) / 100) - 1;
+        if(var_1_pos < 0) var_1_pos = 0;
+        if(var_2_pos < 0) var_2_pos = 0;
+        if (var_1_pos > var_line_1.length - 1) var_1_pos = var_line_1.length - 1;
+        if (var_2_pos > var_line_2.length - 1) var_2_pos = var_line_2.length - 1;
+        // create a 3rd variable line.
+        let var_coord_1 = var_line_1[var_1_pos];
+        let var_coord_2 = var_line_2[var_2_pos];
+        let var_line_3 = line(var_coord_1.x, var_coord_1.y, var_coord_2.x, var_coord_2.y);
+        let var_3_pos = Math.round((var_line_3.length * i) / 100) - 1;
+        if(var_3_pos < 0) var_3_pos = 0;
+        if (var_3_pos > var_line_3.length - 1) var_3_pos = var_line_3.length - 1;
+        
+        // define point[i] on this 3rd variable line. this is the curve coord.
+        coords.push(var_line_3[var_3_pos]);
+    }
+
+    return coords;
+
+}
 // TODO - Add brush size.
 // TODO - Get chars from text field.
 //32 = space, 176 = F1, 177 = F2, 178 = F3, 219 = F4
 function char_brush(x, y, fgcolor, bgcolor) {
-    let newCode = -1;
     const block = doc.data[x + y * render.columns];
-    const coords = line(mouse_x, mouse_y, x, y);
+    //const coords = line(mouse_x, mouse_y, x, y);
+    // temp ds
+    //const coords = []
+    //coords.push({x: x, y: y});
+    const coords = draw_circle(15, 360, 20, 20);
+    //const coords = draw_3point_curve(3, 70, 35, 3, 70, 70);
+    //const coords = draw_4point_curve(2, 70, 35, 70, 35, 2, 70, 2);
+    for (const coord of coords) change_data({x: coord.x, y: coord.y, code: 219, fg: fgcolor, bg: bgcolor});
+    return coords;
+    // end temp
     // While moving mouse, only paint when moved over another block.
     if(prevCoords == null || (prevCoords[0].x != coords[0].x || prevCoords[0].y != coords[0].y)){
+        let newCode = -1;
         if(mouse_button == mouse_button_types.LEFT)
         {
             if(block.code == 32) newCode = 176;
@@ -1145,6 +1235,21 @@ function draw_line_preview(x, y, col) {
         }
     }
 }
+
+// DS
+function draw_circle(radius, steps, centerX, centerY){
+    var xValues = [centerX];
+    var yValues = [centerY];
+    const coords = [];
+    for (var i = 0; i < steps; i++) {
+        xValues[i] = (centerX + radius * Math.cos(2 * Math.PI * i / steps));
+        yValues[i] = (centerY + radius * Math.sin(2 * Math.PI * i / steps))/2;
+        coords.push({x:Math.round(xValues[i]), y: Math.round(yValues[i])});
+    }
+    let k =0;
+    return coords;
+}
+// END DS
 
 function draw_line(x, y, col) {
     start_undo_chunk();
